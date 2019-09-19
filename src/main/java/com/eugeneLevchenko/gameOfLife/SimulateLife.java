@@ -13,7 +13,69 @@ public class SimulateLife {
 
 
 
+    public int getNumOfNeighbors(String[][] tempArr,int i,int j)
+    {
+        int countOfNeighbors=0;
+        //calculate number of neighbors
 
+        //check left neighbor
+        if (j!=0 && tempArr[i][j-1].equals("X"))
+        {
+            countOfNeighbors++;
+        }
+
+        //check upper left neighbor
+
+        if ( (i!=0&&j!=0) && tempArr[i-1][j-1].equals("X"))
+        {
+            countOfNeighbors++;
+        }
+
+        //check up neighbor
+
+        if ( i!=0 && tempArr[i-1][j].equals("X"))
+        {
+            countOfNeighbors++;
+        }
+
+        //check upper right neighbor
+
+        if ( (i != 0 && j!=ROWS-1) && tempArr[i-1][j+1].equals("X"))
+        {
+            countOfNeighbors++;
+        }
+
+        //check right neighbor
+
+        if (j!=ROWS-1 && tempArr[i][j+1].equals("X"))
+        {
+            countOfNeighbors++;
+        }
+
+        //check low right neighbor
+
+        if ((j!=ROWS-1&&i!=COLS-1) && tempArr[i+1][j+1].equals("X"))
+        {
+            countOfNeighbors++;
+        }
+
+        //check low  neighbor
+
+        if ( i!=COLS-1 && tempArr[i+1][j].equals("X"))
+        {
+            countOfNeighbors++;
+        }
+
+        //check low left neighbor
+
+        if ( (i!=COLS-1&&j!=0) && tempArr[i+1][j-1].equals("X"))
+        {
+            countOfNeighbors++;
+        }
+
+
+        return countOfNeighbors;
+    }
 
     public void initInputData()
     {
