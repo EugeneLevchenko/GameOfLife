@@ -9,21 +9,7 @@ public class SimulateLife {
      static int ROWS;
      static String[][] INPUT_ARR;
 
-    public void startSimulate()
-    {
-        initInputData();
-        String[][] tempArr=new String[COLS][ROWS];
 
-        for (int z=0;z<NUMBER_OF_ITERATIONS;z++)
-        {
-            for (int i = 0; i < COLS; i++) {
-                for (int j = 0; j < ROWS; j++) {
-                    System.out.println(INPUT_ARR[i][j]);
-                }
-            }
-
-        }
-    }
 
 
     public void initInputData()
