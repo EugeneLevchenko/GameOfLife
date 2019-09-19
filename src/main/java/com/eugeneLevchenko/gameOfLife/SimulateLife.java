@@ -4,10 +4,13 @@ import java.io.*;
 
 public class SimulateLife {
 
-     static int NUMBER_OF_ITERATIONS;
-     static int COLS;
-     static int ROWS;
-     static String[][] INPUT_ARR;
+    static int NUMBER_OF_ITERATIONS;
+    static int COLS;
+    static int ROWS;
+    static String[][] INPUT_ARR;
+    static String[][] OUTPUT_ARR;
+
+
 
 
 
@@ -80,7 +83,7 @@ public class SimulateLife {
                     builder.append(" ");
             }
             if (i!=INPUT_ARR.length-1)
-            builder.append("\n");
+                builder.append("\n");
         }
 
         BufferedWriter writer = new BufferedWriter(new FileWriter("src\\main\\property\\propertyInputFile.txt"));
