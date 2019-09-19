@@ -12,6 +12,59 @@ public class SimulateLife {
 
 
 
+    public void startSimulate()
+    {
+        initInputData();
+        //  String[][] tempArr=INPUT_ARR;
+        OUTPUT_ARR=new String[COLS][ROWS];
+        for (int i = 0; i < COLS; i++) {
+            for (int j = 0; j < ROWS; j++)
+            {
+                OUTPUT_ARR[i][j]=INPUT_ARR[i][j];
+            }
+        }
+        for (int z=0;z<NUMBER_OF_ITERATIONS;z++)
+        {
+            for (int i = 0; i < COLS; i++) {
+                for (int j = 0; j < ROWS; j++) {
+
+                    int numOfNeighbors=getNumOfNeighbors(INPUT_ARR,i,j);
+
+                    if (INPUT_ARR[i][j].equals("X"))
+                    {
+                        if (numOfNeighbors<2 || numOfNeighbors>3)
+                        {
+                            OUTPUT_ARR[i][j]="O";
+                        }
+                    }
+
+                    if (INPUT_ARR[i][j].equals("O"))
+                    {
+                        if (numOfNeighbors==3)
+                        {
+                            OUTPUT_ARR[i][j]="X";
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < COLS; i++) {
+                for (int j = 0; j < ROWS; j++)
+                {
+                    System.out.print(OUTPUT_ARR[i][j]);
+                    INPUT_ARR[i][j]=OUTPUT_ARR[i][j];
+                }
+                System.out.println();
+            }
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("---------------");
+        }
+    }
+
 
     public int getNumOfNeighbors(String[][] tempArr,int i,int j)
     {
