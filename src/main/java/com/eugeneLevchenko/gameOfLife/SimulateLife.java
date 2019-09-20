@@ -13,7 +13,7 @@ public class SimulateLife {
     private static String[][] INPUT_ARR;
     private static String[][] OUTPUT_ARR;
 
-    public void startSimulate()
+    public void startSimulate(boolean enablePrintToConsole)
     {
         initInputData();
         OUTPUT_ARR=new String[COLS][ROWS];
@@ -54,7 +54,10 @@ public class SimulateLife {
                     INPUT_ARR[i][j]=OUTPUT_ARR[i][j];
                 }
             }
-printEachNewGenerationToConsole(OUTPUT_ARR,z);
+            if (enablePrintToConsole)
+            {
+                printEachNewGenerationToConsole(OUTPUT_ARR,z);
+            }
         }
         writeResultToOutputFile(OUTPUT_ARR);
     }
@@ -66,7 +69,7 @@ printEachNewGenerationToConsole(OUTPUT_ARR,z);
         for (int i = 0; i < COLS; i++) {
             for (int j = 0; j < ROWS; j++)
             {
-                System.out.print(arr[i][j]);
+                System.out.print(arr[i][j]+" ");
             }
             System.out.println();
         }
