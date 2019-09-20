@@ -4,18 +4,18 @@ import java.io.*;
 
 public class SimulateLife {
 
-    static int NUMBER_OF_ITERATIONS;
-    static int COLS;
-    static int ROWS;
-    static String[][] INPUT_ARR;
-    static String[][] OUTPUT_ARR;
+    private static final String PATH_INPUT_FILE="src\\main\\input\\input.txt";
+    private static final String PATH_OUTPUT_FILE="src\\main\\output\\output.txt";
 
-
+    private static int NUMBER_OF_ITERATIONS;
+    private static int COLS;
+    private static int ROWS;
+    private static String[][] INPUT_ARR;
+    private static String[][] OUTPUT_ARR;
 
     public void startSimulate()
     {
         initInputData();
-        //  String[][] tempArr=INPUT_ARR;
         OUTPUT_ARR=new String[COLS][ROWS];
         for (int i = 0; i < COLS; i++) {
             for (int j = 0; j < ROWS; j++)
@@ -47,24 +47,65 @@ public class SimulateLife {
                     }
                 }
             }
-
+//here
             for (int i = 0; i < COLS; i++) {
                 for (int j = 0; j < ROWS; j++)
                 {
-                    System.out.print(OUTPUT_ARR[i][j]);
                     INPUT_ARR[i][j]=OUTPUT_ARR[i][j];
                 }
-                System.out.println();
             }
-            try {
-                Thread.sleep(1500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("---------------");
+printEachNewGenerationToConsole(OUTPUT_ARR,z);
         }
+        writeResultToOutputFile(OUTPUT_ARR);
     }
 
+    public void printEachNewGenerationToConsole(String[][] arr,int z)
+    {
+        z+=1;
+        System.out.println("After "+z+" iteration:");
+        for (int i = 0; i < COLS; i++) {
+            for (int j = 0; j < ROWS; j++)
+            {
+                System.out.print(arr[i][j]);
+            }
+            System.out.println();
+        }
+        System.out.println("------------");
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public void writeResultToOutputFile(String[][] arr)
+    {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < COLS; i++) {
+            for (int j = 0; j < ROWS; j++) {
+                builder.append(arr[i][j]+"");
+                if(j < arr.length - 1)
+                    builder.append(" ");
+            }
+            if (i!=INPUT_ARR.length-1)
+                builder.append("\n");
+        }
+        writeToFile(builder,PATH_OUTPUT_FILE);
+    }
+
+    public void writeToFile(StringBuilder builder,String filePath)
+    {
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(filePath));
+            writer.write(builder.toString());
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public int getNumOfNeighbors(String[][] tempArr,int i,int j)
     {
@@ -126,21 +167,20 @@ public class SimulateLife {
             countOfNeighbors++;
         }
 
-
         return countOfNeighbors;
     }
 
     public void initInputData()
     {
         int count=0;
-        try (BufferedReader br = new BufferedReader(new FileReader("src\\main\\property\\propertyInputFile.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(PATH_INPUT_FILE))) {
             String line;
 
             while ((line = br.readLine()) != null) {
                 line=line.trim();
                 if (count==0)
                 {
-                    NUMBER_OF_ITERATIONS= Integer.parseInt(line);
+                    NUMBER_OF_ITERATIONS = Integer.parseInt(line);
                 }
                 if (count==1)
                 {
@@ -166,15 +206,11 @@ public class SimulateLife {
         }
         if (count<3)
         {
-            try {
-                generateArrRandomlyAndWriteToFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            generateArrRandomlyAndWriteToFile();
         }
     }
 
-    public void generateArrRandomlyAndWriteToFile() throws IOException {
+    public void generateArrRandomlyAndWriteToFile()  {
 
         StringBuilder builder = new StringBuilder();
         builder.append(NUMBER_OF_ITERATIONS+"");
@@ -200,9 +236,6 @@ public class SimulateLife {
             if (i!=INPUT_ARR.length-1)
                 builder.append("\n");
         }
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter("src\\main\\property\\propertyInputFile.txt"));
-        writer.write(builder.toString());
-        writer.close();
+        writeToFile(builder,PATH_INPUT_FILE);
     }
 }
