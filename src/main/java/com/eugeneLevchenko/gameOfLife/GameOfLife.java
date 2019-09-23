@@ -12,7 +12,7 @@ public class GameOfLife {
     private static int ROWS;
     private static String[][] INPUT_ARR;
 
-    public String[][] copyArrFromTo(String[][] fromArr,String[][] toArr)
+    private String[][] copyArrFromTo(String[][] fromArr,String[][] toArr)
     {
         for (int i = 0; i < COLS; i++) {
             for (int j = 0; j < ROWS; j++)
@@ -23,23 +23,32 @@ public class GameOfLife {
         return toArr;
     }
 
-
-    public void checkDeadOrAliveAndChangeItAccordingToRules(String[][] inputArr,String[][] outputArr,int i,int j){
+    private void changeCellStateAccordingToRules(String[][] inputArr,String[][] outputArr,int i,int j)
+    {
         int numOfNeighbors=getNumOfNeighbors(inputArr,i,j);
-        if (inputArr[i][j].equals("X"))
+        boolean isCellAlive=checkIsCellAlive(inputArr,i,j);
+        if (isCellAlive)
         {
-            if (numOfNeighbors<2 || numOfNeighbors>3)
+            if (numOfNeighbors<2 || numOfNeighbors>3) //rule №1
             {
                 outputArr[i][j]="O";
             }
         }
-
-        if (inputArr[i][j].equals("O"))
-        {
-            if (numOfNeighbors==3)
+        else {
+            if (numOfNeighbors==3) //rule №2
             {
                 outputArr[i][j]="X";
             }
+        }
+    }
+
+    private boolean checkIsCellAlive(String[][] inputArr,int i,int j) {
+        if (inputArr[i][j].equals("X")) {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -54,7 +63,7 @@ public class GameOfLife {
         {
             for (int i = 0; i < COLS; i++) {
                 for (int j = 0; j < ROWS; j++) {
-                   checkDeadOrAliveAndChangeItAccordingToRules(INPUT_ARR,outputArr,i,j);
+                   changeCellStateAccordingToRules(INPUT_ARR,outputArr,i,j);
                 }
             }
             INPUT_ARR=copyArrFromTo(outputArr,INPUT_ARR);
@@ -66,7 +75,7 @@ public class GameOfLife {
         writeResultToOutputFile(outputArr);
     }
 
-    public void printEachNewGenerationToConsole(String[][] arr,int z)
+    private void printEachNewGenerationToConsole(String[][] arr,int z)
     {
         z+=1;
         System.out.println("After "+z+" iteration:");
@@ -86,7 +95,7 @@ public class GameOfLife {
 
     }
 
-    public void writeResultToOutputFile(String[][] arr)
+    private void writeResultToOutputFile(String[][] arr)
     {
         StringBuilder builder = new StringBuilder();
         int arrLength=arr.length-1;
@@ -101,9 +110,9 @@ public class GameOfLife {
         writeToFile(builder,PATH_OUTPUT_FILE);
     }
 
-    public void writeToFile(StringBuilder builder,String filePath)
+    private void writeToFile(StringBuilder builder,String filePath)
     {
-        BufferedWriter writer = null;
+        BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(filePath));
             writer.write(builder.toString());
@@ -113,7 +122,7 @@ public class GameOfLife {
         }
     }
 
-    public int getNumOfNeighbors(String[][] tempArr,int i,int j)
+    private int getNumOfNeighbors(String[][] tempArr,int i,int j)
     {
         //calculate number of neighbors
         int countOfNeighbors=0;
@@ -169,7 +178,7 @@ public class GameOfLife {
         return countOfNeighbors;
     }
 
-    public void initInputData()
+    private void initInputData()
     {
         int countLinesInFile=0;
         try (BufferedReader br = new BufferedReader(new FileReader(PATH_INPUT_FILE))) {
@@ -178,10 +187,10 @@ public class GameOfLife {
             while ((line = br.readLine()) != null) {
                 line=line.trim();
                 String[] sizesInputArr = line.split(" ");
-
+                int lengthSizesInputArr=sizesInputArr.length;
                 switch (countLinesInFile) {
                     case 0://process array's size
-                        if (sizesInputArr.length==2) // data is correct
+                        if (lengthSizesInputArr==2) // data is correct
                         {
                             COLS =Integer.parseInt(sizesInputArr[0]);
                             ROWS =Integer.parseInt(sizesInputArr[1]);
@@ -193,7 +202,7 @@ public class GameOfLife {
                         }
                         break;
                     case 1://process number of iterations
-                        if (sizesInputArr.length>1) //data is incorrect
+                        if (lengthSizesInputArr>1) //data is incorrect
                         {
                             System.out.println("You entered incorrect number of iterations,please,enter only 1 number");
                             System.exit(0);
@@ -204,6 +213,13 @@ public class GameOfLife {
                         String[] oneLineOfInputArr = line.split(" ");
                         for (int i=0;i < oneLineOfInputArr.length;i++)
                         {
+                            if (!isSymbolOfCellValid(oneLineOfInputArr,i))
+                            {
+                                System.out.println("You entered incorrect symbol \""+oneLineOfInputArr[i]+"\" of input Array at position: "
+                                        +"["+(countLinesInFile-2)+"]["+i+"]");
+                                System.out.println("Please,fill Array only with \"X\" or \"O\"");
+                                System.exit(0);
+                            }
                             INPUT_ARR[countLinesInFile-2][i]=oneLineOfInputArr[i];
                         }
                         break;
@@ -225,19 +241,28 @@ public class GameOfLife {
         }
     }
 
-    public void generateArrRandomlyAndWriteToFile()  {
+    private boolean isSymbolOfCellValid(String[] arr,int i)
+    {
+        if (arr[i].equals("X")||arr[i].equals("O"))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void generateArrRandomlyAndWriteToFile()  {
 
         StringBuilder builder = new StringBuilder();
         int arrLength=INPUT_ARR.length-1;
 
-        builder.append(COLS+" "+ROWS);
+        builder.append(COLS).append(" ").append(ROWS);
         builder.append("\n");
-        builder.append(NUMBER_OF_ITERATIONS+"");
+        builder.append(NUMBER_OF_ITERATIONS);
         builder.append("\n");
 
         for (int i = 0; i < COLS; i++) {
             for (int j = 0; j < ROWS; j++) {
-                fillArrXorY(i,j);
+                fillArrXOrY(i,j);
                 createBuilder(builder,arrLength,i,j);
             }
             if (i!=arrLength) //to exclude an empty line at the end of file
@@ -248,16 +273,16 @@ public class GameOfLife {
         writeToFile(builder,PATH_INPUT_FILE);
     }
 
-    public void createBuilder(StringBuilder builder,int arrLength,int i,int j)
+    private void createBuilder(StringBuilder builder,int arrLength,int i,int j)
     {
-        builder.append(INPUT_ARR[i][j]+"");
+        builder.append(INPUT_ARR[i][j]);
         if(j < arrLength)
         {
             builder.append(" ");
         }
     }
 
-    public void fillArrXorY(int i,int j)
+    private void fillArrXOrY(int i, int j)
     {
         int resOfRandom=(int)(Math.random()*2);
 
