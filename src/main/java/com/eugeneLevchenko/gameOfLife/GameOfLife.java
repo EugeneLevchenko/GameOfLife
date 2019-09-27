@@ -4,51 +4,47 @@ import java.io.*;
 
 public class GameOfLife {
 
-    private static final String PATH_INPUT_FILE="src\\main\\input\\input.txt";
-    private static final String PATH_OUTPUT_FILE="src\\main\\output\\output.txt";
+    private String pathInputFile ="src\\main\\input\\input.txt";
+    private String pathOutputFile ="src\\main\\output\\output.txt";
 
-    private static int NUMBER_OF_ITERATIONS;
-    private static int COLS;
-    private static int ROWS;
-    private static String[][] INPUT_ARR;
+    private int numberOfIterations;
+    private int cols;
+    private int rows;
+    private String[][] inputArr;
 
     private String[][] copyArrFromTo(String[][] fromArr,String[][] toArr)
     {
-        for (int i = 0; i < COLS; i++) {
-            for (int j = 0; j < ROWS; j++)
+        for (int i = 0; i < cols; i++) {
+            if (rows >= 0)
             {
-                toArr[i][j]=fromArr[i][j];
+                System.arraycopy(fromArr[i], 0, toArr[i], 0, rows);
             }
         }
         return toArr;
     }
 
+    private boolean isCellAlive(String[][] inputArr, int i, int j)
+    {
+        return inputArr[i][j].equals("X");
+    }
+
     private void changeCellStateAccordingToRules(String[][] inputArr,String[][] outputArr,int i,int j)
     {
-        int numOfNeighbors=getNumOfNeighbors(inputArr,i,j);
-        boolean isCellAlive=checkIsCellAlive(inputArr,i,j);
+        int numOfNeighbors= getNumOfNeighbors(inputArr,i,j);
+        boolean isCellAlive= isCellAlive(inputArr,i,j);
+
         if (isCellAlive)
         {
-            if (numOfNeighbors<2 || numOfNeighbors>3) //rule №1
+            if (numOfNeighbors<2 || numOfNeighbors>3)
             {
                 outputArr[i][j]="O";
             }
         }
         else {
-            if (numOfNeighbors==3) //rule №2
+            if (numOfNeighbors==3)
             {
                 outputArr[i][j]="X";
             }
-        }
-    }
-
-    private boolean checkIsCellAlive(String[][] inputArr,int i,int j) {
-        if (inputArr[i][j].equals("X")) {
-            return true;
-        }
-        else
-        {
-            return false;
         }
     }
 
@@ -56,17 +52,17 @@ public class GameOfLife {
     {
         initInputData();
 
-        String[][] outputArr=new String[COLS][ROWS];
-        outputArr=copyArrFromTo(INPUT_ARR,outputArr);
+        String[][] outputArr=new String[cols][rows];
+        outputArr=copyArrFromTo(inputArr,outputArr);
 
-        for (int z=0;z<NUMBER_OF_ITERATIONS;z++)
+        for (int z = 0; z< numberOfIterations; z++)
         {
-            for (int i = 0; i < COLS; i++) {
-                for (int j = 0; j < ROWS; j++) {
-                   changeCellStateAccordingToRules(INPUT_ARR,outputArr,i,j);
+            for (int i = 0; i < cols; i++) {
+                for (int j = 0; j < rows; j++) {
+                    changeCellStateAccordingToRules(inputArr,outputArr,i,j);
                 }
             }
-            INPUT_ARR=copyArrFromTo(outputArr,INPUT_ARR);
+            inputArr = copyArrFromTo(outputArr, inputArr);
             if (enablePrintToConsole)
             {
                 printEachNewGenerationToConsole(outputArr,z);
@@ -79,8 +75,8 @@ public class GameOfLife {
     {
         z+=1;
         System.out.println("After "+z+" iteration:");
-        for (int i = 0; i < COLS; i++) {
-            for (int j = 0; j < ROWS; j++)
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++)
             {
                 System.out.print(arr[i][j]+" ");
             }
@@ -88,7 +84,7 @@ public class GameOfLife {
         }
         System.out.println("------------");
         try {
-            Thread.sleep(1500);
+            Thread.sleep(10);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -100,14 +96,14 @@ public class GameOfLife {
         StringBuilder builder = new StringBuilder();
         int arrLength=arr.length-1;
 
-        for (int i = 0; i < COLS; i++) {
-            for (int j = 0; j < ROWS; j++) {
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
                 createBuilder(builder,arrLength,i,j);
             }
             if (i!=arrLength)
                 builder.append("\n");
         }
-        writeToFile(builder,PATH_OUTPUT_FILE);
+        writeToFile(builder, pathOutputFile);
     }
 
     private void writeToFile(StringBuilder builder,String filePath)
@@ -122,147 +118,361 @@ public class GameOfLife {
         }
     }
 
-    private int getNumOfNeighbors(String[][] tempArr,int i,int j)
+    private int checkUpNeighbors(String[][] tempArray, int j)
     {
-        //calculate number of neighbors
         int countOfNeighbors=0;
+        for (int z = j-1; z < j+2 ; z++) {
+            if ((tempArray[cols-1][z].equals("X"))) {
+                countOfNeighbors++;
+            }
+        }
+        return countOfNeighbors;
+    }
 
-        //check left neighbor
-        if (j!=0 && tempArr[i][j-1].equals("X"))
-        {
+    private int checkLeftNeighbors(String[][] tempArray, int i)
+    {
+        int countOfNeighbors=0;
+        for (int z = i-1; z < i+2; z++) {
+            if ((tempArray[z][cols-1].equals("X"))) {
+                countOfNeighbors++;
+            }
+        }
+        return countOfNeighbors;
+    }
+
+    private int checkRightNeighbors(String[][] tempArray, int i)
+    {
+        int countOfNeighbors=0;
+        for (int z = i - 1; z < i + 2; z++) {
+            if ((tempArray[z][0].equals("X"))) {
+                countOfNeighbors++;
+            }
+        }
+        return countOfNeighbors;
+    }
+
+    private int checkDownNeighbors(String[][] tempArray,int j)
+    {
+        int countOfNeighbors=0;
+        for (int z = j - 1; z < j + 2; z++) {
+            if ((tempArray[0][z].equals("X"))) {
+                countOfNeighbors++;
+            }
+        }
+        return countOfNeighbors;
+    }
+
+    private int neighborsOfLeftUpCorner(String[][] tempArray)
+    {
+        int countOfNeighbors=0;
+        if ((tempArray[0][cols-1].equals("X"))) {
             countOfNeighbors++;
         }
 
-        //check upper left neighbor
-        if ( (i!=0&&j!=0) && tempArr[i-1][j-1].equals("X"))
-        {
+        if ((tempArray[1][cols-1].equals("X"))) {
             countOfNeighbors++;
         }
 
-        //check up neighbor
-        if ( i!=0 && tempArr[i-1][j].equals("X"))
-        {
+        if ((tempArray[cols-1][0].equals("X"))) {
             countOfNeighbors++;
         }
 
-        //check upper right neighbor
-        if ( (i != 0 && j!=ROWS-1) && tempArr[i-1][j+1].equals("X"))
-        {
+        if ((tempArray[cols-1][1].equals("X"))) {
             countOfNeighbors++;
         }
 
-        //check right neighbor
-        if (j!=ROWS-1 && tempArr[i][j+1].equals("X"))
-        {
-            countOfNeighbors++;
-        }
-
-        //check low right neighbor
-        if ((j!=ROWS-1&&i!=COLS-1) && tempArr[i+1][j+1].equals("X"))
-        {
-            countOfNeighbors++;
-        }
-
-        //check low  neighbor
-        if ( i!=COLS-1 && tempArr[i+1][j].equals("X"))
-        {
-            countOfNeighbors++;
-        }
-
-        //check low left neighbor
-        if ( (i!=COLS-1&&j!=0) && tempArr[i+1][j-1].equals("X"))
-        {
+        if ((tempArray[cols-1][cols-1].equals("X"))) {
             countOfNeighbors++;
         }
 
         return countOfNeighbors;
     }
 
-    private void initInputData()
+    private int neighborsOfLeftDownCorner(String[][] tempArray)
     {
-        int countLinesInFile=0;
-        try (BufferedReader br = new BufferedReader(new FileReader(PATH_INPUT_FILE))) {
+        int countOfNeighbors=0;
+
+        if ((tempArray[0][0].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[0][1].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[cols-2][cols-1].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[cols-1][cols-1].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[0][cols-1].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        return countOfNeighbors;
+    }
+
+    private int neighborsOfRightDownCorner(String[][] tempArray)
+    {
+
+        int countOfNeighbors=0;
+
+        if ((tempArray[cols-2][0].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[cols-1][0].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[0][cols-2].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[0][cols-1].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[0][0].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        return countOfNeighbors;
+    }
+
+    private int neighborsOfRightUpCorner(String[][] tempArray)
+    {
+        int countOfNeighbors=0;
+
+        if ((tempArray[0][0].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[1][0].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[cols-1][cols-2].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[cols-1][cols-1].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        if ((tempArray[cols-1][0].equals("X"))) {
+            countOfNeighbors++;
+        }
+
+        return countOfNeighbors;
+    }
+
+    private int getNumberOfNeighborsOfEdgeCell(String[][] tempArray, int i, int j)
+    {
+        int countOfNeighbors;
+
+        /*
+         * The cell can be at the corner (in this case it can have up to 5 neighbors)
+         * Or it may lie on the one of four sides of 2D Arr (In this case it can have up to 3 neighbors)
+         */
+
+        // 1) If the cell is at the corner
+
+        if ( i==0 && j==0 ) //upper left corner
+        {
+            countOfNeighbors= neighborsOfLeftUpCorner(tempArray);
+            return countOfNeighbors;
+        }
+
+       else if ( j==0 && i==cols-1 ) //lower left corner
+        {
+            countOfNeighbors= neighborsOfLeftDownCorner(tempArray);
+            return countOfNeighbors;
+        }
+
+        else if ( i==cols-1 && j==cols-1 ) //lower right corner
+        {
+            countOfNeighbors=neighborsOfRightDownCorner(tempArray);
+            return countOfNeighbors;
+        }
+
+        else if ( i==0 && j==cols-1)  //upper right corner
+        {
+            countOfNeighbors=neighborsOfRightUpCorner(tempArray);
+            return countOfNeighbors;
+        }
+
+        // 2) If the cell lies at one of 4 sides
+        else {
+            countOfNeighbors=getNumberOfNeighborsNotCornerCell(tempArray,i,j);
+        }
+
+        return countOfNeighbors;
+    }
+
+    private int getNumberOfNeighborsNotCornerCell(String[][] tempArray,int i,int j)
+    {
+        int countOfNeighbors=0;
+
+        if (i==0) // Upper side
+        {
+            countOfNeighbors= checkUpNeighbors(tempArray,j);
+            return countOfNeighbors;
+        }
+
+        if (j==0) // Left side
+        {
+            countOfNeighbors= checkLeftNeighbors(tempArray,i);
+            return countOfNeighbors;
+        }
+
+        if (i == cols - 1) // Lower side
+        {
+            countOfNeighbors=  checkDownNeighbors(tempArray,j);
+            return countOfNeighbors;
+        }
+
+        if (j == cols - 1) // Right side
+        {
+            countOfNeighbors=  checkRightNeighbors(tempArray,i);
+            return countOfNeighbors;
+        }
+
+        return countOfNeighbors;
+    }
+
+    private int getNumOfNeighbors(String[][] tempArray, int i, int j) {
+        int countOfNeighbors=0;
+        for(int x = Math.max(0, i-1); x <= Math.min(i+1, cols-1); x++) {
+            for(int y = Math.max(0, j-1); y <= Math.min(j+1, rows-1); y++) {
+                if(x != i || y != j) {
+                    if (tempArray[x][y].equals("X"))
+                    {
+                        countOfNeighbors++;
+                    }
+                }
+            }
+        }
+        countOfNeighbors += getNumberOfNeighborsOfEdgeCell(tempArray, i, j);
+        return countOfNeighbors;
+    }
+
+    private void initSizeAndIterations()
+    {
+        try (BufferedReader br = new BufferedReader(new FileReader(pathInputFile))) {
             String line;
 
-            while ((line = br.readLine()) != null) {
-                line=line.trim();
-                String[] sizesInputArr = line.split(" ");
-                int lengthSizesInputArr=sizesInputArr.length;
-                switch (countLinesInFile) {
-                    case 0://process array's size
-                        if (lengthSizesInputArr==2) // data is correct
-                        {
-                            COLS =Integer.parseInt(sizesInputArr[0]);
-                            ROWS =Integer.parseInt(sizesInputArr[1]);
-                            INPUT_ARR =new String[COLS][ROWS];
-                        }
-                        else {
-                            System.out.println("You entered incorrect array's size,please,enter 2 number");
-                            System.exit(0);
-                        }
-                        break;
-                    case 1://process number of iterations
-                        if (lengthSizesInputArr>1) //data is incorrect
-                        {
-                            System.out.println("You entered incorrect number of iterations,please,enter only 1 number");
-                            System.exit(0);
-                        }
-                        NUMBER_OF_ITERATIONS = Integer.parseInt(line);
-                        break;
-                    default://process input Array
-                        String[] oneLineOfInputArr = line.split(" ");
-                        for (int i=0;i < oneLineOfInputArr.length;i++)
-                        {
-                            if (!isSymbolOfCellValid(oneLineOfInputArr,i))
-                            {
-                                System.out.println("You entered incorrect symbol \""+oneLineOfInputArr[i]+"\" of input Array at position: "
-                                        +"["+(countLinesInFile-2)+"]["+i+"]");
-                                System.out.println("Please,fill Array only with \"X\" or \"O\"");
-                                System.exit(0);
-                            }
-                            INPUT_ARR[countLinesInFile-2][i]=oneLineOfInputArr[i];
-                        }
-                        break;
-                }
-                countLinesInFile++;
-            }
-            if (countLinesInFile==3)//if array is 1D
+            for (int i=0;i<2;i++)
             {
-                System.out.println("You entered one dimension array,please make it 2D");
-                System.exit(0);
+                line = br.readLine();
+                line=line.trim();
+                String[] arrFromLine = line.split(" ");
+                if (i==0) //if we parse 1 line
+                {
+                    processSizes(arrFromLine);
+                }
+                else { //if we parse 2 line
+                    processNumOfIterations(arrFromLine);
+                }
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.out.println("You entered wrong path of file,please check your input file's path");
             e.printStackTrace();
         }
-        if (countLinesInFile<3)//if there isn't arr in file -> create it
+    }
+
+    private void processNumOfIterations(String[] arrIterations)
+    {
+        int  resultParseInt= Integer.parseInt(arrIterations[0]);
+        if (arrIterations.length==1 && resultParseInt>0) //data is correct
+        {
+            numberOfIterations = resultParseInt;
+        }
+        else {
+            System.out.println("You entered incorrect number of iterations,please,enter only 1 integer number");
+            System.exit(0);
+        }
+    }
+
+    private void processSizes(String[] sizesInputArr)
+    {
+        String firstSize=sizesInputArr[0];
+        String secondSize=sizesInputArr[1];
+        if (sizesInputArr.length==2 && Integer.parseInt(firstSize)>1 && Integer.parseInt(secondSize)>1) // data is correct
+        {
+            cols =Integer.parseInt(firstSize);
+            rows =Integer.parseInt(secondSize);
+            inputArr =new String[cols][rows];
+        }
+        else {
+            System.out.println("You entered incorrect array's size,please,enter 2 positive integers");
+            System.exit(0);
+        }
+    }
+
+    private void initInputArr()
+    {
+        int countLinesInFile=0;
+        try (BufferedReader br = new BufferedReader(new FileReader(pathInputFile))) {
+            String line;
+            br.readLine(); //ignore 1 line
+            br.readLine(); //ignore 2 line
+            while ((line = br.readLine()) != null)
+            {
+                String[] arrFromLine = line.split(" ");
+                for (int i=0;i < arrFromLine.length;i++)
+                {
+                    if (!isSymbolOfCellValid(arrFromLine,i))
+                    {
+                        System.out.println("You entered wrong symbol: \""
+                                +arrFromLine[i]+"\" in input Array"+
+                                " at position in Array: ["+(countLinesInFile-2)+"]"
+                                +"["+i+"]");
+                        System.out.println("Please,fill Array only with \"X\" or \"O\"");
+                    }
+                    inputArr[countLinesInFile][i]=arrFromLine[i];
+                }
+                countLinesInFile++;
+            }
+        }
+        catch (IOException e) {
+            System.out.println("You entered wrong path of file,please check your input file's path");
+            e.printStackTrace();
+        }
+        if (countLinesInFile==0)
         {
             generateArrRandomlyAndWriteToFile();
         }
     }
 
+    private void initInputData()
+    {
+        initSizeAndIterations();
+        initInputArr();
+    }
+
     private boolean isSymbolOfCellValid(String[] arr,int i)
     {
-        if (arr[i].equals("X")||arr[i].equals("O"))
-        {
-            return true;
-        }
-        return false;
+        return arr[i].equals("X") || arr[i].equals("O");
     }
 
     private void generateArrRandomlyAndWriteToFile()  {
 
         StringBuilder builder = new StringBuilder();
-        int arrLength=INPUT_ARR.length-1;
+        int arrLength= inputArr.length-1;
 
-        builder.append(COLS).append(" ").append(ROWS);
+        builder.append(cols).append(" ").append(rows);
         builder.append("\n");
-        builder.append(NUMBER_OF_ITERATIONS);
+        builder.append(numberOfIterations);
         builder.append("\n");
 
-        for (int i = 0; i < COLS; i++) {
-            for (int j = 0; j < ROWS; j++) {
-                fillArrXOrY(i,j);
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
+                fillArrXorO(i,j);
                 createBuilder(builder,arrLength,i,j);
             }
             if (i!=arrLength) //to exclude an empty line at the end of file
@@ -270,28 +480,28 @@ public class GameOfLife {
                 builder.append("\n");
             }
         }
-        writeToFile(builder,PATH_INPUT_FILE);
+        writeToFile(builder, pathInputFile);
     }
 
     private void createBuilder(StringBuilder builder,int arrLength,int i,int j)
     {
-        builder.append(INPUT_ARR[i][j]);
+        builder.append(inputArr[i][j]);
         if(j < arrLength)
         {
             builder.append(" ");
         }
     }
 
-    private void fillArrXOrY(int i, int j)
+    private void fillArrXorO(int i, int j)
     {
         int resOfRandom=(int)(Math.random()*2);
 
         if (resOfRandom==0)
         {
-            INPUT_ARR[i][j]="O";
+            inputArr[i][j]="O";
         }
         else {
-            INPUT_ARR[i][j]="X";
+            inputArr[i][j]="X";
         }
     }
 }
