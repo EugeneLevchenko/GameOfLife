@@ -1,11 +1,8 @@
 package com.eugeneLevchenko.gameOfLife;
 
-import java.io.IOException;
-
-
 public class App
 {
-    public static void main( String[] args ) throws IOException {
+    public static void main( String[] args ){
         GameOfLife game = new GameOfLife();
         game.startSimulate(true);
     }

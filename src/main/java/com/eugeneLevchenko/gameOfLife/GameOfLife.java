@@ -12,7 +12,7 @@ public class GameOfLife {
     private int rows;
     private String[][] inputArr;
 
-    private String[][] copyArrFromTo(String[][] fromArr,String[][] toArr)
+    private String[][] copyArrFromTo(String[][] fromArr, String[][] toArr)
     {
         for (int i = 0; i < cols; i++) {
             if (rows >= 0)
@@ -32,7 +32,6 @@ public class GameOfLife {
     {
         int numOfNeighbors= getNumOfNeighbors(inputArr,i,j);
         boolean isCellAlive= isCellAlive(inputArr,i,j);
-
         if (isCellAlive)
         {
             if (numOfNeighbors<2 || numOfNeighbors>3)
@@ -46,6 +45,46 @@ public class GameOfLife {
                 outputArr[i][j]="X";
             }
         }
+    }
+
+    private int correctIndexWhichOutOfBounds(int index)
+    {
+        if (index == -1) {
+            index = cols - 1;
+        }
+        return index;
+    }
+
+    private int getNumOfNeighbors(String[][] inputArr, int i, int j) {
+
+        int numOfNeighbors = 0;
+
+        int up    = (i - 1) % cols;
+        int down  = (i + 1) % cols;
+        int left  = (j - 1) % cols;
+        int right = (j + 1) % cols;
+
+        up=correctIndexWhichOutOfBounds(up);
+        down=correctIndexWhichOutOfBounds(down);
+        left=correctIndexWhichOutOfBounds(left);
+        right=correctIndexWhichOutOfBounds(right);
+
+        int[][] directions = new int[][]{
+                {up, left},   {up, j},    {up, right},
+                {i,left},   /*{curCell}*/ {i,right},
+                {down, left}, {down, j},  {down, right},
+        };
+        int x,y;
+        for (int c = 0; c < directions.length; c++)
+        {
+            x=directions[c][0];
+            y=directions[c][1];
+            if (inputArr[x][y].equals("X"))
+            {
+                numOfNeighbors++;
+            }
+        }
+        return numOfNeighbors;
     }
 
     public void startSimulate(boolean enablePrintToConsole)
@@ -116,248 +155,6 @@ public class GameOfLife {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private int checkUpNeighbors(String[][] tempArray, int j)
-    {
-        int countOfNeighbors=0;
-        for (int z = j-1; z < j+2 ; z++) {
-            if ((tempArray[cols-1][z].equals("X"))) {
-                countOfNeighbors++;
-            }
-        }
-        return countOfNeighbors;
-    }
-
-    private int checkLeftNeighbors(String[][] tempArray, int i)
-    {
-        int countOfNeighbors=0;
-        for (int z = i-1; z < i+2; z++) {
-            if ((tempArray[z][cols-1].equals("X"))) {
-                countOfNeighbors++;
-            }
-        }
-        return countOfNeighbors;
-    }
-
-    private int checkRightNeighbors(String[][] tempArray, int i)
-    {
-        int countOfNeighbors=0;
-        for (int z = i - 1; z < i + 2; z++) {
-            if ((tempArray[z][0].equals("X"))) {
-                countOfNeighbors++;
-            }
-        }
-        return countOfNeighbors;
-    }
-
-    private int checkDownNeighbors(String[][] tempArray,int j)
-    {
-        int countOfNeighbors=0;
-        for (int z = j - 1; z < j + 2; z++) {
-            if ((tempArray[0][z].equals("X"))) {
-                countOfNeighbors++;
-            }
-        }
-        return countOfNeighbors;
-    }
-
-    private int neighborsOfLeftUpCorner(String[][] tempArray)
-    {
-        int countOfNeighbors=0;
-        if ((tempArray[0][cols-1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[1][cols-1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[cols-1][0].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[cols-1][1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[cols-1][cols-1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        return countOfNeighbors;
-    }
-
-    private int neighborsOfLeftDownCorner(String[][] tempArray)
-    {
-        int countOfNeighbors=0;
-
-        if ((tempArray[0][0].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[0][1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[cols-2][cols-1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[cols-1][cols-1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[0][cols-1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        return countOfNeighbors;
-    }
-
-    private int neighborsOfRightDownCorner(String[][] tempArray)
-    {
-
-        int countOfNeighbors=0;
-
-        if ((tempArray[cols-2][0].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[cols-1][0].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[0][cols-2].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[0][cols-1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[0][0].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        return countOfNeighbors;
-    }
-
-    private int neighborsOfRightUpCorner(String[][] tempArray)
-    {
-        int countOfNeighbors=0;
-
-        if ((tempArray[0][0].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[1][0].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[cols-1][cols-2].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[cols-1][cols-1].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        if ((tempArray[cols-1][0].equals("X"))) {
-            countOfNeighbors++;
-        }
-
-        return countOfNeighbors;
-    }
-
-    private int getNumberOfNeighborsOfEdgeCell(String[][] tempArray, int i, int j)
-    {
-        int countOfNeighbors;
-
-        /*
-         * The cell can be at the corner (in this case it can have up to 5 neighbors)
-         * Or it may lie on the one of four sides of 2D Arr (In this case it can have up to 3 neighbors)
-         */
-
-        // 1) If the cell is at the corner
-
-        if ( i==0 && j==0 ) //upper left corner
-        {
-            countOfNeighbors= neighborsOfLeftUpCorner(tempArray);
-            return countOfNeighbors;
-        }
-
-       else if ( j==0 && i==cols-1 ) //lower left corner
-        {
-            countOfNeighbors= neighborsOfLeftDownCorner(tempArray);
-            return countOfNeighbors;
-        }
-
-        else if ( i==cols-1 && j==cols-1 ) //lower right corner
-        {
-            countOfNeighbors=neighborsOfRightDownCorner(tempArray);
-            return countOfNeighbors;
-        }
-
-        else if ( i==0 && j==cols-1)  //upper right corner
-        {
-            countOfNeighbors=neighborsOfRightUpCorner(tempArray);
-            return countOfNeighbors;
-        }
-
-        // 2) If the cell lies at one of 4 sides
-        else {
-            countOfNeighbors=getNumberOfNeighborsNotCornerCell(tempArray,i,j);
-        }
-
-        return countOfNeighbors;
-    }
-
-    private int getNumberOfNeighborsNotCornerCell(String[][] tempArray,int i,int j)
-    {
-        int countOfNeighbors=0;
-
-        if (i==0) // Upper side
-        {
-            countOfNeighbors= checkUpNeighbors(tempArray,j);
-            return countOfNeighbors;
-        }
-
-        if (j==0) // Left side
-        {
-            countOfNeighbors= checkLeftNeighbors(tempArray,i);
-            return countOfNeighbors;
-        }
-
-        if (i == cols - 1) // Lower side
-        {
-            countOfNeighbors=  checkDownNeighbors(tempArray,j);
-            return countOfNeighbors;
-        }
-
-        if (j == cols - 1) // Right side
-        {
-            countOfNeighbors=  checkRightNeighbors(tempArray,i);
-            return countOfNeighbors;
-        }
-
-        return countOfNeighbors;
-    }
-
-    private int getNumOfNeighbors(String[][] tempArray, int i, int j) {
-        int countOfNeighbors=0;
-        for(int x = Math.max(0, i-1); x <= Math.min(i+1, cols-1); x++) {
-            for(int y = Math.max(0, j-1); y <= Math.min(j+1, rows-1); y++) {
-                if(x != i || y != j) {
-                    if (tempArray[x][y].equals("X"))
-                    {
-                        countOfNeighbors++;
-                    }
-                }
-            }
-        }
-        countOfNeighbors += getNumberOfNeighborsOfEdgeCell(tempArray, i, j);
-        return countOfNeighbors;
     }
 
     private void initSizeAndIterations()
@@ -495,7 +292,6 @@ public class GameOfLife {
     private void fillArrXorO(int i, int j)
     {
         int resOfRandom=(int)(Math.random()*2);
-
         if (resOfRandom==0)
         {
             inputArr[i][j]="O";
